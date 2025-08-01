@@ -5,8 +5,8 @@ import numpy as np
 import re
 
 # Convert PDF to images
-pdf_path = r"C:\Users\jtgii\Documents\Jordi\Recipes\Tahini Baby\Tahini Baby 30-164.pdf"  # Confirm this path
-poppler_path = r"D:\Programs\Poppler\poppler-24.08.0\Library\bin"  # Confirmed path
+pdf_path = r"filepath.pdf"  # Confirm this path
+poppler_path = r"filepath\bin"  # Confirmed path
 images = convert_from_path(pdf_path, poppler_path=poppler_path)
 
 # Initialize string to hold all page content
