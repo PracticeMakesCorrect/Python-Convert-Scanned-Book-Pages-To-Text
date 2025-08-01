@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 # Convert PDF to images
-pdf_path = " C:\Users\jtgii\Documents\Jordi\Recipes\Tahini Baby\68.df"  # Replace with your PDF file path
+pdf_path = "filepath.pdf"  # Replace with your PDF file path
 images = convert_from_path(pdf_path)
 
 # Process each page
