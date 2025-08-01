@@ -1,0 +1,72 @@
+from pdf2image import convert_from_path
+import pytesseract
+import pandas as pd
+from sklearn.cluster import KMeans
+import numpy as np
+
+# Convert PDF to images
+pdf_path = " C:\Users\jtgii\Documents\Jordi\Recipes\Tahini Baby\68.df"  # Replace with your PDF file path
+images = convert_from_path(pdf_path)
+
+# Process each page
+for i, image in enumerate(images):
+    # Extract text with bounding box data
+    data = pytesseract.image_to_data(image, config="--psm 1", output_type=pytesseract.Output.DATAFRAME)
+    
+    # Filter out empty or null text
+    text_data = data[data["text"].notnull() & (data["text"].str.strip() != "")]
+    
+    if text_data.empty:
+        print(f"No text found on page {i + 1}")
+        with open(f"page_{i + 1}.txt", "w", encoding="utf-8") as f:
+            f.write(f"Page {i + 1} Content: No text detected.")
+        continue
+
+    # Extract coordinates and text
+    coordinates = text_data[["left", "top"]].values
+    texts = text_data["text"].values
+
+    # Estimate number of columns (up to 3 for your case)
+    n_clusters = min(3, len(set(np.digitize(coordinates[:, 0], np.linspace(min(coordinates[:, 0]), max(coordinates[:, 0]), 4)))))
+    if n_clusters < 2:
+        n_clusters = 2  # Minimum 2 columns
+
+    # Cluster into columns
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = kmeans.fit_predict(coordinates[:, [0]])  # Cluster based on 'left' only
+
+    # Group text by column and preserve line breaks
+    columns = {j: [] for j in range(n_clusters)}
+    for j in range(n_clusters):
+        col_data = text_data[labels == j].sort_values("top")  # Sort by top coordinate
+        lines = []
+        current_line = []
+        prev_top = None
+        
+        for _, row in col_data.iterrows():
+            if prev_top is None or abs(row["top"] - prev_top) > 10:  # Adjust threshold as needed
+                if current_line:
+                    lines.append(" ".join(current_line))
+                current_line = [row["text"]]
+            else:
+                current_line.append(row["text"])
+            prev_top = row["top"]
+        
+        if current_line:
+            lines.append(" ".join(current_line))
+        columns[j] = lines
+
+    # Combine all columns into a single string with labels
+    page_text = f"Page {i + 1} Content:\n"
+    col_order = np.argsort([np.mean(coordinates[labels == j, 0]) for j in range(n_clusters)])
+    for j in col_order:
+        page_text += f"\nColumn {j + 1}:\n" + "\n".join(columns[j]) + "\n"
+
+    # Save to a single file per page
+    with open(f"page_{i + 1}.txt", "w", encoding="utf-8") as f:
+        f.write(page_text)
+    print(f"Saved page {i + 1} to page_{i + 1}.txt")
+
+    # Optional: Print coordinates for debugging
+    print(f"Page {i + 1} coordinates and text:\n", text_data[["left", "top", "text"]])
+
