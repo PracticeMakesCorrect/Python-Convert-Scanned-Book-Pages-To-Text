@@ -1,0 +1,34 @@
+from pdf2image import convert_from_path
+import pytesseract
+import cv2
+import numpy as np
+import re
+
+# Convert PDF to images
+pdf_path = r"C:\Users\jtgii\Documents\Jordi\Recipes\Tahini Baby\Tahini Baby 30-164.pdf"  # Confirm this path
+poppler_path = r"D:\Programs\Poppler\poppler-24.08.0\Library\bin"  # Confirmed path
+images = convert_from_path(pdf_path, poppler_path=poppler_path)
+
+# Initialize string to hold all page content
+all_text = ""
+
+# Process each page
+for i, image in enumerate(images):
+    # Convert to OpenCV format (minimal preprocessing)
+    img = np.array(image)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Grayscale only, no thresholding
+
+    # Extract text with PSM 1
+    text_psm1 = pytesseract.image_to_string(gray, config="--psm 1")  # Automatic layout
+
+    # Attempt to extract book page number from text
+    page_match = re.search(r'\b\d+\b', text_psm1.split('\n')[0])  # Look for a number in the first line
+    book_page = page_match.group(0) if page_match else str(i + 1)  # Use detected number or fall back to PDF index
+
+    # Add page content to the cumulative string
+    all_text += f"\n\nPage {book_page} Content (PSM 1):\n{text_psm1}"
+
+# Save all pages to a single file
+with open("all_pages_psm1.txt", "w", encoding="utf-8") as f:
+    f.write(all_text)
+print(f"Saved all pages to all_pages_psm1.txt")
