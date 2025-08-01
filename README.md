@@ -4,4 +4,4 @@ Wife said thanks but I need to be able to search the text for the recipe names a
 
 This does that. 
 
-Note: replace the part after "pdf_path =" and "poppler_path =" with the locations of your files/folders. And you'll need to install pytesseract and pdf2image and a few other libraries.
+Note: replace the part after "pdf_path =" and "poppler_path =" with the locations of your files/folders. And you'll need to install pytesseract and pdf2image and a few other libraries. If you want all the pages to be saved into one file, use code_consolidated.
