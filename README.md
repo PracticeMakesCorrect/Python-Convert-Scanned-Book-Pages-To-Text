@@ -4,4 +4,4 @@ Wife said thanks but I need to be able to search the text for the recipe names a
 
 This does that. 
 
-Note: you'll need to install pytesseract and pdf2image and a few other libraries.
+Note: replace the part after "pdf_path =" with the location of your file. And you'll need to install pytesseract and pdf2image and a few other libraries.
