@@ -8,4 +8,5 @@ Note: replace the part after "pdf_path =" and "poppler_path =" with the location
 
 Below is the example page from the book that I will show you how to convert. 
 
+
 ![My Image](images/p68.png)
