@@ -1,3 +1,5 @@
+# This will convert all the pages to a single text file
+
 from pdf2image import convert_from_path
 import pytesseract
 import cv2
